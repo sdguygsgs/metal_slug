@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metal Slug | Mission Control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #2d5a27;
+      --dark: #0a120a;
+      --black: #050805;
+      --red: #c41e3a;
+      --orange: #ff6b00;
+      --yellow: #ffd700;
+      --blue: #1e90ff;
+      --metal: #8a9a5b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: var(--black);
+      color: #e0e0e0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse at 20% 40%, rgba(45,90,39,0.25) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 10%, rgba(196,30,58,0.15) 0%, transparent 40%);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(5,8,5,0.95);
+      border-bottom: 3px solid var(--green);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .logo {
+      font-family: 'Press Start 2P', cursive;
+      font-size: clamp(0.7rem, 2.2vw, 1rem);
+      color: var(--yellow);
+      text-shadow: 0 0 12px var(--orange);
+    }
+    .logo span { color: var(--red); }
+
+    .player-box {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .player-name, .score-box {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.55rem;
+      padding: 6px 12px;
+      border-radius: 4px;
+    }
+    .player-name {
+      color: var(--orange);
+      background: rgba(45,90,39,0.4);
+      border: 2px solid var(--green);
+    }
+    .score-box {
+      color: var(--yellow);
+      background: rgba(0,0,0,0.5);
+      border: 2px solid var(--yellow);
+    }
+
+    .hero {
+      min-height: 55vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px 16px;
+      position: relative;
+    }
+
+    .hero-title {
+      font-family: 'Press Start 2P', cursive;
+      font-size: clamp(1.6rem, 7vw, 3.2rem);
+      color: var(--yellow);
+      text-shadow: 4px 4px 0 var(--red), 0 0 25px var(--orange);
+      margin-bottom: 10px;
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+
+    .hero-sub {
+      font-family: 'Press Start 2P', cursive;
+      font-size: clamp(0.45rem, 1.8vw, 0.7rem);
+      color: var(--metal);
+      margin-bottom: 28px;
+      letter-spacing: 1px;
+    }
+
+    .btn {
+      font-family: 'Press Start 2P', cursive;
+      font-size: clamp(0.5rem, 1.4vw, 0.65rem);
+      padding: 14px 24px;
+      border: 3px solid var(--yellow);
+      background: linear-gradient(180deg, var(--green), #1a3a16);
+      color: var(--yellow);
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 4px 0 #0a1a08;
+    }
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 7px 0 #0a1a08, 0 0 18px rgba(255,215,0,0.4);
+    }
+    .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #0a1a08; }
+
+    .btn-red {
+      background: linear-gradient(180deg, var(--red), #8b1528);
+      border-color: var(--orange);
+      color: #fff;
+      box-shadow: 0 4px 0 #5a0e1a;
+    }
+    .btn-red:hover {
+      box-shadow: 0 7px 0 #5a0e1a, 0 0 18px rgba(196,30,58,0.5);
+    }
+
+    section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 16px;
+    }
+
+    .section-title {
+      font-family: 'Press Start 2P', cursive;
+      font-size: clamp(0.75rem, 2.5vw, 1.15rem);
+      color: var(--yellow);
+      text-align: center;
+      margin-bottom: 28px;
+      text-shadow: 2px 2px 0 var(--red);
+    }
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 70px;
+      height: 3px;
+      background: var(--orange);
+      margin: 10px auto 0;
+    }
+
+    .chars {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .char-card {
+      background: linear-gradient(145deg, #122012, #0a150a);
+      border: 3px solid var(--green);
+      border-radius: 8px;
+      padding: 18px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+    .char-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--yellow);
+      box-shadow: 0 8px 24px rgba(255,215,0,0.2);
+    }
+    .char-card.selected {
+      border-color: var(--orange);
+      box-shadow: 0 0 20px rgba(255,107,0,0.45);
+    }
+
+    .char-icon {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.35);
+      border: 2px solid var(--metal);
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    .char-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    .char-icon .fallback {
+      font-size: 2.6rem;
+    }
+
+    .char-name {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.65rem;
+      color: var(--yellow);
+      margin-bottom: 6px;
+    }
+    .char-role {
+      font-size: 0.75rem;
+      color: var(--metal);
+      margin-bottom: 10px;
+    }
+    .char-stats {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.7rem;
+    }
+    .stat {
+      background: rgba(0,0,0,0.4);
+      padding: 3px 8px;
+      border-radius: 3px;
+      border: 1px solid var(--green);
+    }
+
+    .arsenal {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 700px) {
+      .arsenal { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: linear-gradient(145deg, #0f1a0f, #0a120a);
+      border: 3px solid var(--green);
+      border-radius: 8px;
+      padding: 18px;
+      min-height: 240px;
+    }
+    .panel h3 {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.6rem;
+      color: var(--orange);
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .weapons {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 10px;
+    }
+
+    .weapon {
+      background: #1a2a1a;
+      border: 2px solid var(--metal);
+      border-radius: 6px;
+      padding: 10px 6px;
+      text-align: center;
+      cursor: grab;
+      transition: 0.2s;
+      user-select: none;
+    }
+    .weapon:hover {
+      border-color: var(--yellow);
+      transform: scale(1.07);
+      box-shadow: 0 0 10px rgba(255,215,0,0.35);
+    }
+    .weapon:active { cursor: grabbing; }
+    .weapon.dragging { opacity: 0.4; }
+
+    .weapon-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .weapon-icon img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    .weapon-icon .fallback {
+      font-size: 1.7rem;
+    }
+
+    .weapon-name {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.5rem;
+      color: #ccc;
+    }
+
+    .drop-zone {
+      border: 3px dashed var(--green);
+      border-radius: 8px;
+      min-height: 150px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+      background: rgba(45,90,39,0.08);
+      transition: 0.25s;
+    }
+    .drop-zone.over {
+      border-color: var(--yellow);
+      background: rgba(255,215,0,0.1);
+    }
+    .drop-zone .hint {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.5rem;
+      color: var(--metal);
+      text-align: center;
+      opacity: 0.7;
+    }
+
+    .game-ui {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .game-stats {
+      display: flex;
+      gap: 18px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.55rem;
+    }
+    .game-stats span { color: var(--yellow); }
+
+    .game-area {
+      background: linear-gradient(180deg, #1a2a1a, #0d150d);
+      border: 4px solid var(--green);
+      border-radius: 8px;
+      height: 300px;
+      position: relative;
+      overflow: hidden;
+      cursor: crosshair;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+    }
+    .game-area::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 36px;
+      background: repeating-linear-gradient(90deg, #2d5a27 0 18px, #1a3a16 18px 36px);
+      opacity: 0.55;
+    }
+
+    .soldier {
+      position: absolute;
+      bottom: 38px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 55px;
+      height: 55px;
+      z-index: 5;
+      transition: left 0.07s linear;
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .soldier img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    .soldier .fallback {
+      font-size: 2.6rem;
+    }
+
+    .enemy {
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      z-index: 4;
+      cursor: pointer;
+      animation: bob 0.55s ease-in-out infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .enemy img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+    .enemy .fallback { font-size: 1.9rem; }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .bullet {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      background: var(--yellow);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--orange);
+      z-index: 6;
+      pointer-events: none;
+    }
+
+    .explosion {
+      position: absolute;
+      font-size: 2rem;
+      z-index: 7;
+      pointer-events: none;
+      animation: boom 0.45s forwards;
+    }
+    @keyframes boom {
+      0% { transform: scale(0.4); opacity: 1; }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+
+    .hint {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--metal);
+      margin-top: 10px;
+    }
+
+    .intel-box {
+      background: linear-gradient(145deg, #0f1a0f, #0a120a);
+      border: 3px solid var(--blue);
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 520px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .intel-result {
+      margin-top: 16px;
+      padding: 16px;
+      background: rgba(0,0,0,0.4);
+      border: 2px solid var(--green);
+      border-radius: 6px;
+      min-height: 90px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+    }
+    .intel-result .loc {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.65rem;
+      color: var(--yellow);
+    }
+    .intel-result .temp {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.3rem;
+      color: var(--orange);
+    }
+
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .modal-bg.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal {
+      background: linear-gradient(145deg, #1a2a1a, #0d150d);
+      border: 4px solid var(--yellow);
+      border-radius: 10px;
+      padding: 28px 24px;
+      width: 90%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 0 35px rgba(255,215,0,0.25);
+    }
+    .modal h2 {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.85rem;
+      color: var(--yellow);
+      margin-bottom: 18px;
+    }
+    .modal input {
+      width: 100%;
+      padding: 12px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      background: #0a120a;
+      border: 2px solid var(--green);
+      color: #fff;
+      border-radius: 4px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .modal input:focus {
+      outline: none;
+      border-color: var(--yellow);
+    }
+
+    footer {
+      text-align: center;
+      padding: 28px 16px;
+      border-top: 3px solid var(--green);
+      margin-top: 20px;
+      background: rgba(0,0,0,0.35);
+    }
+    footer p {
+      font-size: 0.75rem;
+      color: var(--metal);
+      margin-bottom: 4px;
+    }
+    footer .credit {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.48rem;
+      color: var(--yellow);
+      margin-top: 10px;
+    }
+
+    @media (max-width: 500px) {
+      .game-area { height: 240px; }
+      .soldier { width: 45px; height: 45px; }
+      .enemy { width: 34px; height: 34px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="modal-bg show" id="modal">
+    <div class="modal">
+      <h2>IDENTIFÍCATE, SOLDADO</h2>
+      <input type="text" id="nameInput" placeholder="Tu nombre de combate" maxlength="14" autocomplete="off">
+      <button class="btn" id="btnStart">¡ENTRAR EN MISIÓN!</button>
+    </div>
+  </div>
+
+  <header>
+    <div class="logo"><span>METAL</span> SLUG</div>
+    <div class="player-box">
+      <div class="player-name" id="nameDisplay">SOLDADO ???</div>
+      <div class="score-box">SCORE: <span id="totalScore">0</span></div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1 class="hero-title">METAL SLUG</h1>
+    <p class="hero-sub">MISSION CONTROL • OPERATION INTERACTIVE</p>
+    <button class="btn btn-red" id="btnGoGame">¡COMENZAR OPERACIÓN!</button>
+  </section>
+
+  <!-- 
+    ============================================
+    CÓMO AGREGAR IMÁGENES LOCALES
+    ============================================
+    1. Crea una carpeta llamada "img" junto a este archivo HTML
+    2. Coloca las imágenes con estos nombres EXACTOS:
+
+    PERSONAJES:
+      img/marco.png
+      img/tarma.png
+      img/eri.png
+      img/fio.png
+
+    ARMAS:
+      img/heavy.png
+      img/rocket.png
+      img/shotgun.png
+      img/flame.png
+      img/laser.png
+      img/grenade.png
+
+    ENEMIGOS (opcional):
+      img/enemy1.png
+      img/enemy2.png
+      img/enemy3.png
+
+    3. Si la imagen no existe, se muestra automáticamente el emoji de respaldo.
+    ============================================
+  -->
+
+  <section>
+    <h2 class="section-title">SELECCIONA TU SOLDADO</h2>
+    <div class="chars" id="chars">
+
+      <div class="char-card selected" data-char="marco" data-img="img/marco.png" data-fallback="🧑‍✈️">
+        <div class="char-icon">
+          <img src="img/marco.png" alt="Marco" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <span class="fallback" style="display:none;">🧑‍✈️</span>
+        </div>
+        <div class="char-name">MARCO</div>
+        <div class="char-role">Líder del escuadrón</div>
+        <div class="char-stats"><span class="stat">ATK ★★★</span><span class="stat">SPD ★★</span></div>
+      </div>
+
+      <div class="char-card" data-char="tarma" data-img="img/tarma.png" data-fallback="💪">
+        <div class="char-icon">
+          <img src="img/tarma.png" alt="Tarma" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <span class="fallback" style="display:none;">💪</span>
+        </div>
+        <div class="char-name">TARMA</div>
+        <div class="char-role">Especialista en vehículos</div>
+        <div class="char-stats"><span class="stat">ATK ★★</span><span class="stat">SPD ★★★</span></div>
+      </div>
+
+      <div class="char-card" data-char="eri" data-img="img/eri.png" data-fallback="💥">
+        <div class="char-icon">
+          <img src="img/eri.png" alt="Eri" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <span class="fallback" style="display:none;">💥</span>
+        </div>
+        <div class="char-name">ERI</div>
+        <div class="char-role">Experta en explosivos</div>
+        <div class="char-stats"><span class="stat">ATK ★★★★</span><span class="stat">SPD ★</span></div>
+      </div>
+
+      <div class="char-card" data-char="fio" data-img="img/fio.png" data-fallback="🎯">
+        <div class="char-icon">
+          <img src="img/fio.png" alt="Fio" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <span class="fallback" style="display:none;">🎯</span>
+        </div>
+        <div class="char-name">FIO</div>
+        <div class="char-role">Francotiradora de élite</div>
+        <div class="char-stats"><span class="stat">ATK ★★★</span><span class="stat">SPD ★★★</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">ARSENAL • DRAG & DROP</h2>
+    <div class="arsenal">
+      <div class="panel">
+        <h3>ARMAMENTO DISPONIBLE</h3>
+        <div class="weapons" id="weapons">
+
+          <div class="weapon" draggable="true" data-w="heavy">
+            <div class="weapon-icon">
+              <img src="img/heavy.png" alt="Heavy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <span class="fallback" style="display:none;">🔫</span>
+            </div>
+            <div class="weapon-name">HEAVY</div>
+          </div>
+
+          <div class="weapon" draggable="true" data-w="rocket">
+            <div class="weapon-icon">
+              <img src="img/rocket.png" alt="Rocket" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <span class="fallback" style="display:none;">🚀</span>
+            </div>
+            <div class="weapon-name">ROCKET</div>
+          </div>
+
+          <div class="weapon" draggable="true" data-w="shotgun">
+            <div class="weapon-icon">
+              <img src="img/shotgun.png" alt="Shotgun" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <span class="fallback" style="display:none;">💥</span>
+            </div>
+            <div class="weapon-name">SHOTGUN</div>
+          </div>
+
+          <div class="weapon" draggable="true" data-w="flame">
+            <div class="weapon-icon">
+              <img src="img/flame.png" alt="Flame" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <span class="fallback" style="display:none;">🔥</span>
+            </div>
+            <div class="weapon-name">FLAME</div>
+          </div>
+
+          <div class="weapon" draggable="true" data-w="laser">
+            <div class="weapon-icon">
+              <img src="img/laser.png" alt="Laser" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <span class="fallback" style="display:none;">⚡</span>
+            </div>
+            <div class="weapon-name">LASER</div>
+          </div>
+
+          <div class="weapon" draggable="true" data-w="grenade">
+            <div class="weapon-icon">
+              <img src="img/grenade.png" alt="Grenade" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <span class="fallback" style="display:none;">💣</span>
+            </div>
+            <div class="weapon-name">GRENADE</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>EQUIPAMIENTO ACTIVO</h3>
+        <div class="drop-zone" id="dropZone">
+          <div class="hint">Arrastra armas aquí<br>para equipar (máx 3)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gameSection">
+    <h2 class="section-title">CAMPO DE BATALLA</h2>
+    <div class="game-ui">
+      <div class="game-stats">
+        <div>KILLS: <span id="kills">0</span></div>
+        <div>SCORE: <span id="gScore">0</span></div>
+        <div>VIDAS: <span id="lives">3</span></div>
+      </div>
+      <button class="btn" id="btnGame">¡DESPLEGAR!</button>
+    </div>
+    <div class="game-area" id="gameArea">
+      <div class="soldier" id="soldier">
+        <img src="img/marco.png" alt="Soldier" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <span class="fallback" style="display:none;">🧑‍✈️</span>
+      </div>
+    </div>
+    <p class="hint">← → para mover • ESPACIO o CLIC para disparar</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">INTELIGENCIA DE MISIÓN</h2>
+    <div class="intel-box">
+      <p style="margin-bottom:14px;font-size:0.9rem;color:#aaa;">Reporte meteorológico en tiempo real de la zona de operaciones</p>
+      <button class="btn" id="btnWeather">📡 OBTENER REPORTE</button>
+      <div class="intel-result" id="weatherBox">
+        <div style="color:var(--metal);font-size:0.8rem;">Esperando órdenes...</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Metal Slug Mission Control — Proyecto Interactivo</p>
+    <p>HTML5 • CSS3 (Grid/Flexbox + Animaciones) • JavaScript • Open-Meteo API</p>
+    <p class="credit">Creado con 💥 para el escuadrón</p>
+  </footer>
+
+<script>
+(function() {
+  let playerName = localStorage.getItem('ms_name') || '';
+  let totalScore = parseInt(localStorage.getItem('ms_score') || '0', 10);
+  let equipped = [];
+  let gameOn = false;
+  let kills = 0, gScore = 0, lives = 3;
+  let soldierX = 50;
+  let enemies = [];
+  let bullets = [];
+  let loopId = null;
+  let spawnId = null;
+
+  // Cada enemigo tiene su propia imagen + emoji fijo de respaldo
+  const enemiesData = [
+    { img: 'img/enemy1.png', fallback: '👾' },  // enemy1 → alien
+    { img: 'img/enemy2.png', fallback: '🤖' },  // enemy2 → robot
+    { img: 'img/enemy3.png', fallback: '💀' }   // enemy3 → calavera
+  ];
+
+  const missions = [
+    { name: "Desierto de Arabia", lat: 24.0, lon: 45.0 },
+    { name: "Selva del Amazonas", lat: -3.4, lon: -60.0 },
+    { name: "Base Ártica", lat: 78.2, lon: 15.6 },
+    { name: "Ciudad en Ruinas", lat: 35.6, lon: 139.6 },
+    { name: "Isla Volcánica", lat: -16.5, lon: -151.7 },
+    { name: "Cañón del Diablo", lat: 36.1, lon: -112.1 }
+  ];
+
+  const modal = document.getElementById('modal');
+  const nameInput = document.getElementById('nameInput');
+  const btnStart = document.getElementById('btnStart');
+  const nameDisplay = document.getElementById('nameDisplay');
+  const totalScoreEl = document.getElementById('totalScore');
+  const dropZone = document.getElementById('dropZone');
+  const gameArea = document.getElementById('gameArea');
+  const soldier = document.getElementById('soldier');
+  const killsEl = document.getElementById('kills');
+  const gScoreEl = document.getElementById('gScore');
+  const livesEl = document.getElementById('lives');
+  const btnGame = document.getElementById('btnGame');
+  const btnWeather = document.getElementById('btnWeather');
+  const weatherBox = document.getElementById('weatherBox');
+  const btnGoGame = document.getElementById('btnGoGame');
+
+  totalScoreEl.textContent = totalScore;
+  if (playerName) {
+    nameDisplay.textContent = playerName.toUpperCase();
+    modal.classList.remove('show');
+  }
+
+  btnStart.addEventListener('click', saveName);
+  nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') saveName(); });
+
+  function saveName() {
+    const n = nameInput.value.trim();
+    if (n.length < 2) {
+      nameInput.style.borderColor = 'var(--red)';
+      nameInput.placeholder = '¡Mínimo 2 letras!';
+      return;
+    }
+    playerName = n;
+    localStorage.setItem('ms_name', playerName);
+    nameDisplay.textContent = playerName.toUpperCase();
+    modal.classList.remove('show');
+  }
+
+  btnGoGame.addEventListener('click', () => {
+    document.getElementById('gameSection').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  document.querySelectorAll('.char-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.char-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+
+      const imgPath = card.dataset.img;
+      const fallback = card.dataset.fallback;
+      const soldierImg = soldier.querySelector('img');
+      const soldierFallback = soldier.querySelector('.fallback');
+
+      if (soldierImg) {
+        soldierImg.src = imgPath;
+        soldierImg.style.display = 'block';
+        if (soldierFallback) soldierFallback.style.display = 'none';
+
+        soldierImg.onerror = function() {
+          this.style.display = 'none';
+          if (soldierFallback) {
+            soldierFallback.textContent = fallback;
+            soldierFallback.style.display = 'block';
+          }
+        };
+      }
+    });
+  });
+
+  document.querySelectorAll('.weapon').forEach(w => {
+    w.addEventListener('dragstart', e => {
+      w.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', w.dataset.w);
+    });
+    w.addEventListener('dragend', () => w.classList.remove('dragging'));
+  });
+
+  dropZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropZone.classList.add('over');
+  });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('over');
+    const type = e.dataTransfer.getData('text/plain');
+    if (!type || equipped.includes(type)) return;
+    if (equipped.length >= 3) {
+      alert('¡Máximo 3 armas!');
+      return;
+    }
+    equipped.push(type);
+    renderEquip();
+  });
+
+  function renderEquip() {
+    dropZone.innerHTML = '';
+    if (equipped.length === 0) {
+      dropZone.innerHTML = '<div class="hint">Arrastra armas aquí<br>para equipar (máx 3)</div>';
+      return;
+    }
+
+    const icons = {
+      heavy: { img: 'img/heavy.png', fallback: '🔫' },
+      rocket: { img: 'img/rocket.png', fallback: '🚀' },
+      shotgun: { img: 'img/shotgun.png', fallback: '💥' },
+      flame: { img: 'img/flame.png', fallback: '🔥' },
+      laser: { img: 'img/laser.png', fallback: '⚡' },
+      grenade: { img: 'img/grenade.png', fallback: '💣' }
+    };
+
+    equipped.forEach(w => {
+      const data = icons[w];
+      const el = document.createElement('div');
+      el.className = 'weapon';
+      el.innerHTML = `
+        <div class="weapon-icon">
+          <img src="${data.img}" alt="${w}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <span class="fallback" style="display:none;">${data.fallback}</span>
+        </div>
+        <div class="weapon-name">${w.toUpperCase()}</div>
+      `;
+      el.style.cursor = 'pointer';
+      el.title = 'Clic para quitar';
+      el.addEventListener('click', () => {
+        equipped = equipped.filter(x => x !== w);
+        renderEquip();
+      });
+      dropZone.appendChild(el);
+    });
+  }
+
+  btnGame.addEventListener('click', () => {
+    if (gameOn) stopGame();
+    else startGame();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (!gameOn) return;
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+      soldierX = Math.max(6, soldierX - 5);
+      soldier.style.left = soldierX + '%';
+    }
+    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+      soldierX = Math.min(94, soldierX + 5);
+      soldier.style.left = soldierX + '%';
+    }
+    if (e.key === ' ' || e.code === 'Space') {
+      e.preventDefault();
+      shoot();
+    }
+  });
+
+  gameArea.addEventListener('click', () => {
+    if (gameOn) shoot();
+  });
+
+  function startGame() {
+    gameOn = true;
+    kills = 0; gScore = 0; lives = 3;
+    enemies = []; bullets = [];
+    updateUI();
+    gameArea.querySelectorAll('.enemy, .bullet, .explosion').forEach(el => el.remove());
+    soldierX = 50;
+    soldier.style.left = '50%';
+    btnGame.textContent = 'RETIRADA';
+
+    spawnId = setInterval(spawnEnemy, 1100);
+    loopId = requestAnimationFrame(loop);
+  }
+
+  function stopGame() {
+    gameOn = false;
+    clearInterval(spawnId);
+    cancelAnimationFrame(loopId);
+    totalScore += gScore;
+    localStorage.setItem('ms_score', totalScore);
+    totalScoreEl.textContent = totalScore;
+    btnGame.textContent = '¡DESPLEGAR!';
+  }
+
+  function spawnEnemy() {
+    if (!gameOn) return;
+    const el = document.createElement('div');
+    el.className = 'enemy';
+
+    // Elegir un enemigo al azar (cada uno con su icono fijo)
+    const data = enemiesData[Math.floor(Math.random() * enemiesData.length)];
+
+    el.innerHTML = `
+      <img src="${data.img}" alt="enemy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="fallback" style="display:none;">${data.fallback}</span>
+    `;
+
+    const x = 8 + Math.random() * 84;
+    el.style.left = x + '%';
+    el.style.top = '-30px';
+    el.dataset.x = x;
+    el.dataset.y = -30;
+    gameArea.appendChild(el);
+    enemies.push(el);
+    el.addEventListener('click', () => killEnemy(el));
+  }
+
+  function shoot() {
+    if (!gameOn) return;
+    const b = document.createElement('div');
+    b.className = 'bullet';
+    b.style.left = `calc(${soldierX}% - 3px)`;
+    b.style.bottom = '85px';
+    b.dataset.x = soldierX;
+    b.dataset.y = gameArea.clientHeight - 85;
+    gameArea.appendChild(b);
+    bullets.push(b);
+  }
+
+  function killEnemy(el) {
+    if (!enemies.includes(el)) return;
+    const r = el.getBoundingClientRect();
+    const ar = gameArea.getBoundingClientRect();
+    boom(r.left - ar.left + 10, r.top - ar.top + 10);
+    el.remove();
+    enemies = enemies.filter(e => e !== el);
+    kills++;
+    gScore += 100 + equipped.length * 30;
+    updateUI();
+  }
+
+  function boom(x, y) {
+    const e = document.createElement('div');
+    e.className = 'explosion';
+    e.textContent = '💥';
+    e.style.left = x + 'px';
+    e.style.top = y + 'px';
+    gameArea.appendChild(e);
+    setTimeout(() => e.remove(), 450);
+  }
+
+  function loop() {
+    if (!gameOn) return;
+
+    for (let i = bullets.length - 1; i >= 0; i--) {
+      const b = bullets[i];
+      let y = parseFloat(b.dataset.y) - 14;
+      b.dataset.y = y;
+      b.style.bottom = (gameArea.clientHeight - y) + 'px';
+      if (y < 0) {
+        b.remove();
+        bullets.splice(i, 1);
+      }
+    }
+
+    for (let i = enemies.length - 1; i >= 0; i--) {
+      const e = enemies[i];
+      let y = parseFloat(e.dataset.y) + 2.2;
+      e.dataset.y = y;
+      e.style.top = y + 'px';
+
+      if (y > gameArea.clientHeight - 90) {
+        const ex = parseFloat(e.dataset.x);
+        if (Math.abs(ex - soldierX) < 14) {
+          boom(ex / 100 * gameArea.clientWidth, y);
+          e.remove();
+          enemies.splice(i, 1);
+          lives--;
+          updateUI();
+          if (lives <= 0) {
+            stopGame();
+            alert('¡MISIÓN FALLIDA!\nKills: ' + kills + ' | Score: ' + gScore);
+          }
+          continue;
+        } else {
+          e.remove();
+          enemies.splice(i, 1);
+          continue;
+        }
+      }
+
+      for (let j = bullets.length - 1; j >= 0; j--) {
+        const b = bullets[j];
+        const bx = parseFloat(b.dataset.x);
+        const by = parseFloat(b.dataset.y);
+        const ex = parseFloat(e.dataset.x);
+        const ey = parseFloat(e.dataset.y);
+        if (Math.abs(bx - ex) < 9 && Math.abs(by - ey) < 28) {
+          killEnemy(e);
+          b.remove();
+          bullets.splice(j, 1);
+          break;
+        }
+      }
+    }
+
+    loopId = requestAnimationFrame(loop);
+  }
+
+  function updateUI() {
+    killsEl.textContent = kills;
+    gScoreEl.textContent = gScore;
+    livesEl.textContent = lives;
+  }
+
+  btnWeather.addEventListener('click', async () => {
+    btnWeather.disabled = true;
+    btnWeather.textContent = '📡 ESCANEANDO...';
+    weatherBox.innerHTML = '<div style="color:var(--metal)">Obteniendo datos de satélite...</div>';
+
+    const m = missions[Math.floor(Math.random() * missions.length)];
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${m.lat}&longitude=${m.lon}&current_weather=true`;
+
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Sin señal');
+      const data = await res.json();
+      const w = data.current_weather;
+      const codes = {
+        0: 'Despejado ☀️', 1: 'Mayormente despejado 🌤️', 2: 'Parcialmente nublado ⛅',
+        3: 'Nublado ☁️', 45: 'Niebla 🌫️', 51: 'Llovizna 🌧️', 61: 'Lluvia 🌧️',
+        71: 'Nieve ❄️', 80: 'Chubascos 🌦️', 95: 'Tormenta ⛈️'
+      };
+      const desc = codes[w.weathercode] || 'Condición ' + w.weathercode;
+
+      weatherBox.innerHTML = `
+        <div class="loc">📍 ${m.name}</div>
+        <div style="font-size:1.05rem">${desc}</div>
+        <div class="temp">${w.temperature}°C</div>
+        <div style="font-size:0.75rem;color:#aaa">Viento: ${w.windspeed} km/h</div>
+      `;
+    } catch (err) {
+      weatherBox.innerHTML = `<div style="color:var(--red)">Error de transmisión</div>`;
+    } finally {
+      btnWeather.disabled = false;
+      btnWeather.textContent = '📡 OBTENER REPORTE';
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
